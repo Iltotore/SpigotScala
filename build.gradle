@@ -1,0 +1,100 @@
+import static fr.il_totore.manadrop.MinecraftRepositoryHelper.*
+import static fr.il_totore.manadrop.MinecraftDependencyHelper.spigotApi
+plugins {
+    id 'fr.il_totore.manadrop' version '0.4.1-SNAPSHOT'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'maven-publish'
+}
+
+allprojects {
+    apply plugin: 'scala'
+    apply plugin: 'fr.il_totore.manadrop'
+    apply from: "${rootProject.rootDir}/scala.gradle"
+
+    group 'io.github.iltotore'
+    version '1.0'
+
+    repositories {
+        mavenCentral()
+        spigotSnapshot()
+        sonatype()
+    }
+
+    dependencies {
+        implementation scalaLib()
+        compileOnly spigotApi('1.16.1')
+    }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+javadocJar {
+    from new File(buildDir, 'docs/scaladoc')
+    group 'build'
+    dependsOn scaladoc
+}
+
+scaladoc {
+    source project.sourceSets.main.allScala
+    project.configurations.implementation.canBeResolved = true
+    scalaClasspath+=project.configurations.implementation
+}
+
+shadowJar {
+    configurations = [project.configurations.implementation]
+    classifier = ''
+}
+
+publishing {
+    publications {
+        mavenScala(MavenPublication) {
+            artifactId = 'spigot-scala_' + getMajorVersion(scalaVersion)
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('implementation')
+                }
+            }
+
+            repositories {
+                maven {
+                    url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                    credentials {
+                        username = "Il_totore"
+                        password = System.getenv("SONATYPE_PASSWORD")
+                    }
+                }
+            }
+
+            pom {
+                name = 'Spigot Scala'
+                description = 'Spigot sugar for Scala'
+                url = 'https://github.com/Iltotore/SpigotScala'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'iltotore'
+                        name = 'Il_totore'
+                        email = 'rafbodaha@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/Iltotore/SpigotScala.git'
+                    developerConnection = 'scm:git:ssh://github.com/Iltotore/SpigotScala.git'
+                    url = 'https://github.com/Iltotore/SpigotScala.git'
+                }
+            }
+
+            from components.java
+        }
+    }
+}

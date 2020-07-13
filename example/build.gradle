@@ -1,0 +1,16 @@
+dependencies {
+    implementation rootProject
+}
+
+spigot {
+    desc {
+        authors 'Il_totore'
+        description 'SpigotScala example plugin'
+        main 'io.github.iltotore.scala.spigot.example.Main'
+
+        command {
+            named 'sec'
+            description 'print each seconds during 10s'
+        }
+    }
+}
