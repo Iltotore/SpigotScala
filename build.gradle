@@ -45,19 +45,13 @@ scaladoc {
 
 shadowJar {
     configurations = [project.configurations.implementation]
-    classifier = ''
+    archiveClassifier = ''
 }
 
 publishing {
     publications {
         mavenScala(MavenPublication) {
             artifactId = 'spigot-scala_' + getMajorVersion(scalaVersion)
-
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('implementation')
-                }
-            }
 
             repositories {
                 maven {
