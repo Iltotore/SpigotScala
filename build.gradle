@@ -4,10 +4,19 @@ plugins {
     id 'fr.il_totore.manadrop' version '0.4.1-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '5.2.0'
     id 'maven-publish'
+    id 'signing'
+}
+
+Properties localProperties = new Properties()
+localProperties.load(rootProject.file('local.properties').newDataInputStream())
+
+for(Map.Entry<String, ?> entry : localProperties.entrySet()){
+    project.ext[entry.getKey()] = entry.getValue()
 }
 
 allprojects {
     apply plugin: 'scala'
+    apply plugin: 'java-library'
     apply plugin: 'fr.il_totore.manadrop'
     apply from: "${rootProject.rootDir}/scala.gradle"
 
@@ -21,7 +30,7 @@ allprojects {
     }
 
     dependencies {
-        implementation scalaLib()
+        api scalaLib()
         compileOnly spigotApi('1.16.1')
     }
 }
@@ -39,12 +48,12 @@ javadocJar {
 
 scaladoc {
     source project.sourceSets.main.allScala
-    project.configurations.implementation.canBeResolved = true
-    scalaClasspath+=project.configurations.implementation
+    project.configurations.api.canBeResolved = true
+    scalaClasspath+=project.configurations.api
 }
 
 shadowJar {
-    configurations = [project.configurations.implementation]
+    configurations = [project.configurations.api]
     archiveClassifier = ''
 }
 
@@ -91,4 +100,13 @@ publishing {
             from components.java
         }
     }
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenScala
 }

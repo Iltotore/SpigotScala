@@ -5,6 +5,9 @@ import java.util.UUID
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
+/**
+ * Wrapper for Bukkit.getPlayer
+ */
 object Player {
   def apply(name: String): Player = Bukkit.getPlayer(name)
   def apply(id: UUID): Player = Bukkit.getPlayer(id)
