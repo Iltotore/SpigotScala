@@ -57,6 +57,15 @@ shadowJar {
     archiveClassifier = ''
 }
 
+spigot {
+    desc {
+        main 'io.github.iltotore.scala.spigot.Plugin'
+        load 'STARTUP'
+    }
+}
+
+processResources.finalizedBy(spigotPlugin)
+
 publishing {
     publications {
         mavenScala(MavenPublication) {

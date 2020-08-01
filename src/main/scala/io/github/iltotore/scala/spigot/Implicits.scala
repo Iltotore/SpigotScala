@@ -31,7 +31,7 @@ object Implicits {
     def color(char: Char = '&'): String = ChatColor.translateAlternateColorCodes(char, base)
   }
 
-  implicit class InventoryDecorator(base: Inventory) {
+  implicit class InventoryDecorator(base: Inventory) extends IndexedSeq[Int] {
 
     /**
      * Operator alias of Inventory#addItem
@@ -191,6 +191,7 @@ object Implicits {
 
     /**
      * Get the score of an entry for the wrapped Objective as Int.
+     *
      * @param entry the entry to get score of.
      * @return the score of the given entry for the wrapped Objective.
      */
@@ -198,6 +199,7 @@ object Implicits {
 
     /**
      * Set the score of an entry for the wrapped Objective.
+     *
      * @param entry the entry to set score of.
      * @param score the new score.
      */
