@@ -12,13 +12,14 @@ import org.bukkit.scoreboard.Objective
 import org.bukkit.util.Vector
 import org.bukkit.{ChatColor, Location, World}
 
+import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.Try
 
 /**
  * Contains implicit decorators classes.
  */
-object Implicits {
+object Decorators {
 
   implicit class StringDecorator(base: String) {
 
@@ -31,7 +32,7 @@ object Implicits {
     def color(char: Char = '&'): String = ChatColor.translateAlternateColorCodes(char, base)
   }
 
-  implicit class InventoryDecorator(base: Inventory) extends IndexedSeq[Int] {
+  implicit class InventoryDecorator(base: Inventory) extends IndexedSeq[ItemStack] {
 
     /**
      * Operator alias of Inventory#addItem
@@ -55,7 +56,9 @@ object Implicits {
      * @param index the slot index.
      * @return an Optional potentially containing the held ItemStack.
      */
-    def apply(index: Int): Option[ItemStack] = Option(base.getItem(index))
+    override def apply(index: Int): ItemStack = base.getItem(index)
+
+    override def length: Int = base.getSize
   }
 
   implicit class WorldDecorator(base: World) {
@@ -96,18 +99,8 @@ object Implicits {
      * @tparam T the wanted entity type.
      * @return a collection of entities matching with the given type.
      */
-    def getEntitiesOfType[T <: Entity: ClassTag](implicit tag: ClassTag[T]): util.Collection[T] =
-      base.getEntitiesByClass(tag.runtimeClass.asInstanceOf[Class[T]])
-  }
-
-  implicit class CommandAssignment(name: String)(implicit plugin: JavaPlugin) {
-
-    /**
-     * Set the executor of the given command represented by his name.
-     *
-     * @param executor the command executor.
-     */
-    def ~>(executor: CommandExecutor): Unit = plugin.getCommand(name).setExecutor(executor)
+    def getEntitiesOfType[T <: Entity: ClassTag](implicit tag: ClassTag[T]): Iterable[T] =
+      base.getEntitiesByClass(tag.runtimeClass.asInstanceOf[Class[T]]).asScala
   }
 
   implicit class EquipmentDecorator(base: EntityEquipment) {
